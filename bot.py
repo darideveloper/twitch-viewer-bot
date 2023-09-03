@@ -46,6 +46,7 @@ class Bot (WebScraping):
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
         self.twitch_url_pupup = f"https://player.twitch.tv/?channel={self.stream}&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=160p30&volume=0.5"
+        self.twitch_url_chat = f"https://www.twitch.tv/popout/{self.stream}/chat?popout="
         self.status = "running"
         
         # Css selectors
@@ -222,27 +223,6 @@ class Bot (WebScraping):
             
             return False
         
-        # Open stream in popup
-        try:
-            # Accept mature content
-            self.set_page (self.twitch_url_pupup)
-            sleep (1)
-            self.refresh_selenium ()            
-            
-        except Exception as e:
-            error = f"\t({self.stream} - {self.username}) popup error"
-            
-            # Save error details
-            with open (self.log_path, "a", encoding='UTF-8') as file:
-                file.write (f"{self.stream} - {self.username}: {str(e)}\n")
-            
-            # Try to take screenshot
-            try:
-                screenshot_path = os.path.join(self.screenshots_folder, "errors", f"{self.stream} - {self.username}.png")
-                self.screenshot (screenshot_path)
-            except:
-                print (f"\t({self.stream} - {self.username}) error taking screenshot")            
-
         # Accept mature content
         start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
         if start_stream_elem:
@@ -254,7 +234,14 @@ class Bot (WebScraping):
         if self.take_screenshots:
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
             self.screenshot (screenshot_path)
-            
+        
+        # Open chat in new tab
+        self.set_page_js (self.twitch_url_chat, new_tab=True)
+        sleep (60)
+        
+        # return to stream tab
+        self.switch_to_tab (0)
+        
         return True
         
     def __send_message__ (self, message):

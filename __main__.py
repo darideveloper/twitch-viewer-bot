@@ -1,4 +1,3 @@
-import os
 from bots import BotsManager
 
 if __name__ == "__main__":

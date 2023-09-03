@@ -488,8 +488,6 @@ class WebScraping ():
         else:
             script = f'window.open("{web_page}").focus();'
 
-        print(script)
-
         self.driver.execute_script(script)
 
     def set_page(self, web_page, time_out=0, break_time_out=False):
