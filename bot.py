@@ -160,7 +160,10 @@ class Bot (WebScraping):
                         self.kill ()
                     except:
                         pass
-                    sleep (60)
+                    
+                    # Random wait time between 1 and 2 minutes
+                    random_wait = random.randint (60, 120)
+                    sleep (random_wait)
                     continue
                 else:
                     browser_opened = True
