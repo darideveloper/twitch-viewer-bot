@@ -156,6 +156,10 @@ class Bot (WebScraping):
                 except Exception as e:
                     error = e
                     print (f"\t({self.stream} - {self.username}), error opening browser, trying again in 1 minute...")
+                    try:
+                        self.kill ()
+                    except:
+                        pass
                     sleep (60)
                     continue
                 else:
