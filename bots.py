@@ -64,22 +64,19 @@ class BotsManager ():
             
             if not self.proxies:
                 continue
-                                                    
-            # Default user
-            user = {
-                "name": "no-user",
-                "cookies": [],
-                "is_active": True
-            }
-            
+  
             # Get random user
             if stream_users:
                 user = random.choice (stream_users)
                 stream_users.remove (user)
-            
+                
                 # Only start debug users
                 if DEBUG_USERS and user["name"] not in DEBUG_USERS:
                     continue
+                
+            else:
+                continue
+            
             
             # Wait random time before create bot
             sleep (random.randint (1, 10))
