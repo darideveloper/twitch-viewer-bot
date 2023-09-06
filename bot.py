@@ -12,10 +12,10 @@ DEBUG = os.getenv ("DEBUG") == "true"
 
 class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
-    
+        
     def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
-                  bots_running:list=[]) -> bool:
+                  bots_running:list=[], error_send:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -40,6 +40,7 @@ class Bot (WebScraping):
         self.height = height
         self.take_screenshots = take_screenshots
         self.bots_running = bots_running
+        self.error_send = error_send
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -145,31 +146,15 @@ class Bot (WebScraping):
             # Get random proxy for current bot
             proxy = self.__get_random_proxy__ ()
             
-            browser_opened = False
-            error = ""
-            for _ in range (2):
-                # Try to start chrome
-                try:
-                    super().__init__ (headless=self.headless, time_out=30,
-                                    proxy_server=proxy["host"], proxy_port=proxy["port"],
-                                    width=self.width, height=self.height)
-                except Exception as e:
-                    error = e
-                    print (f"\t({self.stream} - {self.username}), error opening browser, trying again in 1 minute...")
-                    try:
-                        self.kill ()
-                    except:
-                        pass
-                    
-                    # Random wait time between 1 and 2 minutes
-                    random_wait = random.randint (60, 120)
-                    sleep (random_wait)
-                    continue
-                else:
-                    browser_opened = True
-                    break
+            # Try to start chrome
+            try:
+                super().__init__ (headless=self.headless, time_out=30,
+                                proxy_server=proxy["host"], proxy_port=proxy["port"],
+                                width=self.width, height=self.height)
                 
-            if not browser_opened:
+            
+            except Exception as error:
+                
                 error = f"\t({self.stream} - {self.username}): error opening browser, and max retries reached: ({error})"
                 print (error)
                 
@@ -177,10 +162,10 @@ class Bot (WebScraping):
                 with open (self.log_path, "a", encoding='UTF-8') as file:
                     file.write (error)
                 
-                # Save error in api
-                self.api.log_error (error)
-                
-                quit ()
+                # Save error in api only one time
+                if not self.error_send[0]:
+                    self.api.log_error (error)
+                    self.error_send[0] = True                
 
             proxy_working = self.__load_twitch__ ()    
             

@@ -14,6 +14,9 @@ if DEBUG_USERS and DEBUG_USERS != "":
     DEBUG_USERS = DEBUG_USERS.split (",")
 DIABLE_THREADS = os.getenv ("DIABLE_THREADS") == "true"
 
+# Control variable for send errors to api
+error_send = [False]
+
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
     
@@ -78,10 +81,14 @@ class BotsManager ():
                 if DEBUG_USERS and user["name"] not in DEBUG_USERS:
                     continue
             
+            # Wait random time before create bot
+            sleep (random.randint (1, 10))
+            
             try:
                 bot = Bot (user["name"], user["cookies"], stream, self.proxies,
                         headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
-                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
+                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream], 
+                        error_send=error_send)
             except Exception as e:
                 error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
                 print (error)
