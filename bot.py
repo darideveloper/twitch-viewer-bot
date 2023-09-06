@@ -133,6 +133,12 @@ class Bot (WebScraping):
         else:
             return True
         
+    def __set_quality_mute__ (self): 
+        """ Set video quality to lower and mute stream, with local storage """
+        
+        self.set_local_storage ("video-quality", '{"default":"160p30"}')
+        self.set_local_storage ("volume", "0")
+        
     def __start_bot__ (self) -> bool:
         """ Start browser and watch stream
 
@@ -187,6 +193,7 @@ class Bot (WebScraping):
         # Load cookies
         if self.username != "no-user":
             self.set_cookies (self.cookies)
+            self.__set_quality_mute__ ()
         
         # Open stream
         try:

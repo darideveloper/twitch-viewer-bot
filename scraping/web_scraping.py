@@ -666,3 +666,14 @@ class WebScraping ():
                 break
             else:
                 time.sleep(0.5)
+
+    def set_local_storage (self, key:str, value:str):
+        """ Set a value in local storage with js
+
+        Args:
+            key (str): local storage key
+            value (str): local storage value
+        """
+        
+        script = f"window.localStorage.setItem('{key}', '{value}')"
+        self.driver.execute_script (script)
