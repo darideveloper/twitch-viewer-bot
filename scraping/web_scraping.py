@@ -15,6 +15,7 @@ class WebScraping ():
     """
     
     service = None
+    options = None
 
     def __init__(self, headless=False, time_out=0,
                  proxy_server="", proxy_port="", proxy_user="", proxy_pass="",
@@ -119,37 +120,87 @@ class WebScraping ():
         os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
 
         # Configure browser
-        options = webdriver.ChromeOptions()
-        options.add_argument('--no-sandbox')
-        options.add_argument('--start-maximized')
-        options.add_argument('--output=/dev/null')
-        options.add_argument('--log-level=3')
-        options.add_argument("--disable-notifications")
-        options.add_argument("--disable-infobars")
-        options.add_argument("--safebrowsing-disable-download-protection")
-
-        # Experimentals
-        if self.__experimentals__:
-            options.add_experimental_option(
-                'excludeSwitches', ['enable-logging', "enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
-
-        # screen size
-        options.add_argument(f"--window-size={self.__width__},{self.__height__}")
-        
-        # headless mode
-        if self.__headless__:
-            options.add_argument("--headless=new")
+        if not WebScraping.options:
             
-        if self.__mute__:
-            options.add_argument("--mute-audio")
+            WebScraping.options = webdriver.ChromeOptions()
+            WebScraping.options.add_argument('--no-sandbox')
+            WebScraping.options.add_argument('--start-maximized')
+            WebScraping.options.add_argument('--output=/dev/null')
+            WebScraping.options.add_argument('--log-level=3')
+            WebScraping.options.add_argument("--disable-notifications")
+            WebScraping.options.add_argument("--disable-infobars")
+            WebScraping.options.add_argument("--safebrowsing-disable-download-protection")
+            
+            WebScraping.options.add_argument("--disable-dev-shm-usage")
+            WebScraping.options.add_argument("--disable-renderer-backgrounding")
+            WebScraping.options.add_argument("--disable-background-timer-throttling")
+            WebScraping.options.add_argument("--disable-backgrounding-occluded-windows")
+            WebScraping.options.add_argument("--disable-client-side-phishing-detection")
+            WebScraping.options.add_argument("--disable-crash-reporter")
+            WebScraping.options.add_argument("--disable-oopr-debug-crash-dump")
+            WebScraping.options.add_argument("--no-crash-upload")
+            WebScraping.options.add_argument("--disable-gpu")
+            WebScraping.options.add_argument("--disable-extensions")
+            WebScraping.options.add_argument("--disable-low-res-tiling")
+            WebScraping.options.add_argument("--log-level=3")
+            WebScraping.options.add_argument("--silent")
+
+            # Experimentals
+            if self.__experimentals__:
+                WebScraping.options.add_experimental_option(
+                    'excludeSwitches', ['enable-logging', "enable-automation"])
+                WebScraping.options.add_experimental_option('useAutomationExtension', False)
+
+            # screen size
+            WebScraping.options.add_argument(f"--window-size={self.__width__},{self.__height__}")
+            
+            # headless mode
+            if self.__headless__:
+                WebScraping.options.add_argument("--headless=new")
+                
+            if self.__mute__:
+                WebScraping.options.add_argument("--mute-audio")
+                
+            # Set chrome folder
+            if self.__chrome_folder__:
+                WebScraping.options.add_argument(f"--user-data-dir={self.__chrome_folder__}")
+
+            # Set default user agent
+            if self.__user_agent__:
+                WebScraping.options.add_argument(
+                    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36')
+
+            if self.__download_folder__:
+                prefs = {"download.default_directory": f"{self.__download_folder__}",
+                        "download.prompt_for_download": "false",
+                        'profile.default_content_setting_values.automatic_downloads': 1,
+                        'profile.default_content_settings.popups': 0,
+                        "download.directory_upgrade": True,
+                        "plugins.always_open_pdf_externally": True,
+                        "plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}],
+                        'download.extensions_to_open': 'xml',
+                        'safebrowsing.enabled': True
+                        }
+
+                WebScraping.options.add_experimental_option("prefs", prefs)
+
+            if self.__extensions__:
+                for extension in self.__extensions__:
+                    WebScraping.options.add_extension(extension)
+
+            if self.__incognito__:
+                WebScraping.options.add_argument("--incognito")
+
+            if self.__experimentals__:
+                WebScraping.options.add_argument(
+                    "--disable-blink-features=AutomationControlled")
 
         # Set proxy without autentication
         if (self.__proxy_server__ and self.__proxy_port__
                 and not self.__proxy_user__ and not self.__proxy_pass__):
 
             proxy = f"{self.__proxy_server__}:{self.__proxy_port__}"
-            options.add_argument(f"--proxy-server={proxy}")
+            WebScraping.options.add_argument(f"--proxy-server={proxy}")
 
         # Set proxy with autentification
         # seleniumwire_options = {}
@@ -157,46 +208,15 @@ class WebScraping ():
                 and self.__proxy_user__ and self.__proxy_pass__):
             
             self.__create_proxy_extesion__()
-            options.add_extension(self.__pluginfile__)
-
-        # Set chrome folder
-        if self.__chrome_folder__:
-            options.add_argument(f"--user-data-dir={self.__chrome_folder__}")
-
-        # Set default user agent
-        if self.__user_agent__:
-            options.add_argument(
-                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36')
-
-        if self.__download_folder__:
-            prefs = {"download.default_directory": f"{self.__download_folder__}",
-                     "download.prompt_for_download": "false",
-                     'profile.default_content_setting_values.automatic_downloads': 1,
-                     'profile.default_content_settings.popups': 0,
-                     "download.directory_upgrade": True,
-                     "plugins.always_open_pdf_externally": True,
-                     "plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}],
-                     'download.extensions_to_open': 'xml',
-                     'safebrowsing.enabled': True
-                     }
-
-            options.add_experimental_option("prefs", prefs)
-
-        if self.__extensions__:
-            for extension in self.__extensions__:
-                options.add_extension(extension)
-
-        if self.__incognito__:
-            options.add_argument("--incognito")
-
-        if self.__experimentals__:
-            options.add_argument(
-                "--disable-blink-features=AutomationControlled")
+            WebScraping.options.add_extension(self.__pluginfile__)
 
         # Set configuration to  and create instance
         if not WebScraping.service:
             WebScraping.service = Service()
-        self.driver = webdriver.Chrome(service=WebScraping.service, options=options)
+        self.driver = webdriver.Chrome(
+            service=WebScraping.service, 
+            options=WebScraping.options
+        )
 
     def __create_proxy_extesion__(self):
         """Create a proxy chrome extension"""
