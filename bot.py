@@ -249,7 +249,7 @@ class Bot (WebScraping):
         # Hide video
         sleep (3)
         script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
-        self.execute_script (script)
+        self.driver.execute_script (script)
         
         return True
         
