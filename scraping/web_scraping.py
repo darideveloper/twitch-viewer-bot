@@ -215,10 +215,10 @@ class WebScraping ():
             WebScraping.options.add_extension(self.__pluginfile__)
 
         # Set configuration to  and create instance
-        # if not WebScraping.service:
-        #     WebScraping.service = Service()
+        if not WebScraping.service:
+            WebScraping.service = ChromeService(ChromeDriverManager().install())
             
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        self.driver = webdriver.Chrome(service=WebScraping.service)
 
 
     def __create_proxy_extesion__(self):
