@@ -7,10 +7,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-
 current_file = os.path.basename(__file__)
 
 class WebScraping ():
@@ -148,7 +144,7 @@ class WebScraping ():
             WebScraping.options.add_argument("--disable-low-res-tiling")
             WebScraping.options.add_argument("--log-level=3")
             WebScraping.options.add_argument("--silent")
-
+            
             # Experimentals
             if self.__experimentals__:
                 WebScraping.options.add_experimental_option(
@@ -214,11 +210,14 @@ class WebScraping ():
             self.__create_proxy_extesion__()
             WebScraping.options.add_extension(self.__pluginfile__)
 
-        # Set configuration to  and create instance
+        # Autoinstall driver with selenium
         if not WebScraping.service:
-            WebScraping.service = ChromeService(ChromeDriverManager().install())
+            WebScraping.service = Service()
             
-        self.driver = webdriver.Chrome(service=WebScraping.service)
+        self.driver = webdriver.Chrome(
+            service=WebScraping.service,
+            options=WebScraping.options
+        )
 
 
     def __create_proxy_extesion__(self):
