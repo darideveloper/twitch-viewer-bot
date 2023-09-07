@@ -249,7 +249,7 @@ class Bot (WebScraping):
     
         # Pause video
         sleep (3)
-        self.click_js (self.selectors["play_btn"])
+        self.click_js (self.selectors["play_btn"], silent=True)
     
         # Hide video
         sleep (3)

@@ -523,13 +523,17 @@ class WebScraping ():
             else:
                 self.driver.execute_script("window.stop();")
 
-    def click_js(self, selector):
+    def click_js(self, selector:str, silent:bool=False):
         """
         Send click with js, for hiden elements
         """
-
-        elem = self.driver.find_element(By.CSS_SELECTOR, selector)
-        self.driver.execute_script("arguments[0].click();", elem)
+        
+        if silent:
+            script = f"document.querySelector('{selector}').click();"
+            self.driver.execute_script(script)
+        else:
+            elem = self.driver.find_element(By.CSS_SELECTOR, selector)
+            self.driver.execute_script("arguments[0].click();", elem)
 
     def select_drop_down_index(self, selector, index):
         """
