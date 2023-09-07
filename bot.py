@@ -236,13 +236,6 @@ class Bot (WebScraping):
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
             self.screenshot (screenshot_path)
         
-        # Open chat in new tab
-        self.set_page_js (self.twitch_url_chat, new_tab=True)
-        sleep (60)
-        
-        # return to stream tab
-        self.switch_to_tab (0)
-        
         return True
         
     def __send_message__ (self, message):

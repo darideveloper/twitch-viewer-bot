@@ -121,7 +121,7 @@ class BotsManager ():
                     current_bots = 0
                     sleep (8)
                     print (f"\nWaiting 3 minutes before start next {self.settings['threads']} bots...\n")
-                    sleep (60*3)
+                    sleep (60*5)
                         
         # Infinity loop to watch stream
         print ("Bot running...")
