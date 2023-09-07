@@ -243,14 +243,17 @@ class Bot (WebScraping):
             self.refresh_selenium ()
     
         # Pause video
+        sleep (5)
+        self.refresh_selenium ()
         play_buttons = self.get_elems (self.selectors["play_btn"])
         if play_buttons:
             self.click_js (self.selectors["play_btn"])
     
         # Hide video
-        sleep (3)
-        script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
-        self.driver.execute_script (script)
+        player = self.get_elems (self.selectors["player"])
+        if player:
+            script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
+            self.driver.execute_script (script)
         
         # Take screenshot
         if self.take_screenshots:
