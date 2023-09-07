@@ -12,10 +12,13 @@ DEBUG = os.getenv ("DEBUG") == "true"
 
 class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
+    
+    # Control if error was send to api
+    error_send = False
         
     def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
-                  bots_running:list=[], error_send:list=[]) -> bool:
+                  bots_running:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -40,7 +43,6 @@ class Bot (WebScraping):
         self.height = height
         self.take_screenshots = take_screenshots
         self.bots_running = bots_running
-        self.error_send = error_send
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -161,7 +163,7 @@ class Bot (WebScraping):
             
             except Exception as error:
                 
-                error = f"\t({self.stream} - {self.username}): error opening browser, and max retries reached: ({error})"
+                error = f"\t({self.stream} - {self.username}): error opening browser ({error})"
                 print (error)
                 
                 # Save error details
@@ -169,9 +171,9 @@ class Bot (WebScraping):
                     file.write (error)
                 
                 # Save error in api only one time
-                if not self.error_send[0]:
+                if not Bot.error_send:
                     self.api.log_error (error)
-                    self.error_send[0] = True                
+                    Bot.error_send = True                
 
             proxy_working = self.__load_twitch__ ()    
             
