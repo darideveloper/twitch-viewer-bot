@@ -7,6 +7,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
 
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+
 current_file = os.path.basename(__file__)
 
 class WebScraping ():
@@ -211,12 +215,11 @@ class WebScraping ():
             WebScraping.options.add_extension(self.__pluginfile__)
 
         # Set configuration to  and create instance
-        if not WebScraping.service:
-            WebScraping.service = Service()
-        self.driver = webdriver.Chrome(
-            service=WebScraping.service, 
-            options=WebScraping.options
-        )
+        # if not WebScraping.service:
+        #     WebScraping.service = Service()
+            
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
 
     def __create_proxy_extesion__(self):
         """Create a proxy chrome extension"""
