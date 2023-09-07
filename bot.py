@@ -15,6 +15,9 @@ class Bot (WebScraping):
     
     # Control if error was send to api
     error_send = False
+    
+    # Manage status of the current bots
+    bots_status = []
         
     def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
@@ -106,8 +109,16 @@ class Bot (WebScraping):
         
         print (f"({self.stream} - {self.username}) Starting bot...")
         
+        # Add new status to list
+        Bot.bots_status.append ("loading")
+        
         # Start bot and catch load page error
         started = self.__start_bot__ ()
+        
+        # Remove loading status from list, and add watching status
+        Bot.bots_status.remove ("loading")
+        Bot.bots_status.append ("watching")
+        
         if started:
             
             # Save bot in list of bots running
@@ -138,8 +149,11 @@ class Bot (WebScraping):
     def __set_quality_mute__ (self): 
         """ Set video quality to lower and mute stream, with local storage """
         
-        self.set_local_storage ("video-quality", '{"default":"160p30"}')
-        self.set_local_storage ("volume", "0")
+        try:
+            self.set_local_storage ("video-quality", '{"default":"160p30"}')
+            self.set_local_storage ("volume", "0")
+        except:
+            pass
         
     def __start_bot__ (self) -> bool:
         """ Start browser and watch stream
@@ -173,7 +187,9 @@ class Bot (WebScraping):
                 # Save error in api only one time
                 if not Bot.error_send:
                     self.api.log_error (error)
-                    Bot.error_send = True                
+                    Bot.error_send = True    
+                    
+                quit ()            
 
             proxy_working = self.__load_twitch__ ()    
             

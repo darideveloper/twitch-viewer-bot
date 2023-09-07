@@ -19,7 +19,6 @@ class BotsManager ():
     
     def __init__ (self):     
         
-        
         # Connect to api
         api = Api ()
         self.api = api
@@ -119,9 +118,14 @@ class BotsManager ():
                     
                     # Wait before next bots
                     current_bots = 0
-                    sleep (8)
-                    print (f"\nWaiting 3 minutes before start next {self.settings['threads']} bots...\n")
-                    sleep (60*5)
+                    
+                    # Wait until all bots ends running
+                    status = Bot.bots_status
+                    while True:
+                        if "loading" in status:
+                            sleep (10)
+                        else:
+                            break
                         
         # Infinity loop to watch stream
         print ("Bot running...")
