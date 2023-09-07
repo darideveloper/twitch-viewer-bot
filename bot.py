@@ -242,12 +242,12 @@ class Bot (WebScraping):
             sleep (5)
             self.refresh_selenium ()
     
-        # Pause video
-        sleep (5)
-        self.refresh_selenium ()
-        play_buttons = self.get_elems (self.selectors["play_btn"])
-        if play_buttons:
-            self.click_js (self.selectors["play_btn"])
+        # # Pause video
+        # sleep (5)
+        # self.refresh_selenium ()
+        # play_buttons = self.get_elems (self.selectors["play_btn"])
+        # if play_buttons:
+        #     self.click_js (self.selectors["play_btn"])
     
         # Hide video
         player = self.get_elems (self.selectors["player"])
