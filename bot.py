@@ -57,10 +57,11 @@ class Bot (WebScraping):
         
         # Css selectors
         self.selectors = {
-            "twitch-login-btn": 'button[data-a-target="login-button"]',
+            "twitch_login_btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target*="start-watching"]',
             "offline_status": '.home .channel-status-info.channel-status-info--offline', 
             'player': '.persistent-player',           
+            "play_btn": '[data-a-target="player-play-pause-button"]', 
         }
         
         # paths
@@ -215,7 +216,7 @@ class Bot (WebScraping):
             return False
         
         # Validte session with cookies
-        login_button = self.get_elems (self.selectors["twitch-login-btn"])
+        login_button = self.get_elems (self.selectors["twitch_login_btn"])
         if login_button and self.username != "no-user":
             error = f"\t({self.stream} - {self.username}) cookie error"
             print (error)
@@ -245,7 +246,11 @@ class Bot (WebScraping):
         if self.take_screenshots:
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
             self.screenshot (screenshot_path)
-            
+    
+        # Pause video
+        sleep (3)
+        self.click_js (self.selectors["play_btn"])
+    
         # Hide video
         sleep (3)
         script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
