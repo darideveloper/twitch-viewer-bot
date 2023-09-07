@@ -126,6 +126,9 @@ class Bot (WebScraping):
             
             print (f"\t({self.stream} - {self.username}) Bot running (total bots in all stream: {len (self.bots_running)})")
             
+            # Delete current instance
+            del self
+            
         else:
             # Force end bot
             self.driver.quit ()
