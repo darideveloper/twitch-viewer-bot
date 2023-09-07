@@ -14,9 +14,6 @@ if DEBUG_USERS and DEBUG_USERS != "":
     DEBUG_USERS = DEBUG_USERS.split (",")
 DIABLE_THREADS = os.getenv ("DIABLE_THREADS") == "true"
 
-# Control variable for send errors to api
-error_send = [False]
-
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
     
@@ -84,8 +81,7 @@ class BotsManager ():
             try:
                 bot = Bot (user["name"], user["cookies"], stream, self.proxies,
                         headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
-                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream], 
-                        error_send=error_send)
+                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
             except Exception as e:
                 error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
                 print (error)
@@ -124,8 +120,8 @@ class BotsManager ():
                     # Wait before next bots
                     current_bots = 0
                     sleep (8)
-                    print (f"\nWaiting 2 minutes before start next {self.settings['threads']} bots...\n")
-                    sleep (120)
+                    print (f"\nWaiting 3 minutes before start next {self.settings['threads']} bots...\n")
+                    sleep (60*3)
                         
         # Infinity loop to watch stream
         print ("Bot running...")
