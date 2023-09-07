@@ -57,19 +57,9 @@ class Bot (WebScraping):
         
         # Css selectors
         self.selectors = {
-            "twitch-logo": 'a[aria-label="Twitch Home"]',
             "twitch-login-btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target*="start-watching"]',
-            'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
-            'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
-            'comment_textarea': '[role="textbox"]',
-            'comment_send_btn': 'button[data-a-target="chat-send-button"]',
-            'comment_accept_btn': 'button[data-test-selector="chat-rules-ok-button"]',
-            "offline_status": '.home .channel-status-info.channel-status-info--offline',
-            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
-            "stream-popout-player": '[data-a-target="player-settings-menu"] > div:nth-child(5) > button',
-            'stream-mature-btn': 'button[data-a-target="player-overlay-mature-accept"]'
-            
+            "offline_status": '.home .channel-status-info.channel-status-info--offline',            
         }
         
         # paths
@@ -256,36 +246,6 @@ class Bot (WebScraping):
             self.screenshot (screenshot_path)
         
         return True
-        
-    def __send_message__ (self, message):
-        
-        # Validate if constrols are visible
-        comment_textarea = self.get_elems (self.selectors["comment_textarea"])
-        comment_send_btn = self.get_elems (self.selectors["comment_send_btn"])
-        if not comment_textarea or not comment_send_btn:
-            raise Exception ("Controls not visible")
-        
-        # Write message
-        sleep (3)
-        self.refresh_selenium ()
-        self.send_data (self.selectors["comment_textarea"], message)
-        
-        # Accept chat rules
-        sleep (1)
-        self.refresh_selenium ()
-        comment_accept_elem = self.get_elems (self.selectors["comment_accept_btn"])
-        if comment_accept_elem:
-            self.click_js (self.selectors["comment_accept_btn"])
-            sleep (1)
-            self.refresh_selenium ()
-        
-        
-            # Write and submit message
-            self.send_data (self.selectors["comment_textarea"], message)
-            sleep (2)
-            
-        self.click_js (self.selectors["comment_send_btn"])       
-
         
 if __name__ == "__main__":
     
