@@ -59,7 +59,8 @@ class Bot (WebScraping):
         self.selectors = {
             "twitch-login-btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target*="start-watching"]',
-            "offline_status": '.home .channel-status-info.channel-status-info--offline',            
+            "offline_status": '.home .channel-status-info.channel-status-info--offline', 
+            'player': '.persistent-player',           
         }
         
         # paths
@@ -244,6 +245,11 @@ class Bot (WebScraping):
         if self.take_screenshots:
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
             self.screenshot (screenshot_path)
+            
+        # Hide video
+        sleep (3)
+        script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
+        self.execute_script (script)
         
         return True
         
