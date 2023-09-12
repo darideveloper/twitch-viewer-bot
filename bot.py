@@ -61,7 +61,6 @@ class Bot (WebScraping):
             'start-stream-btn': 'button[data-a-target*="start-watching"]',
             "offline_status": '.home .channel-status-info.channel-status-info--offline', 
             'player': '.persistent-player',           
-            "play_btn": '[data-a-target="player-play-pause-button"]', 
         }
         
         # paths
@@ -241,13 +240,6 @@ class Bot (WebScraping):
             self.click_js (self.selectors["start-stream-btn"])
             sleep (5)
             self.refresh_selenium ()
-    
-        # # Pause video
-        # sleep (5)
-        # self.refresh_selenium ()
-        # play_buttons = self.get_elems (self.selectors["play_btn"])
-        # if play_buttons:
-        #     self.click_js (self.selectors["play_btn"])
     
         # Hide video
         player = self.get_elems (self.selectors["player"])
