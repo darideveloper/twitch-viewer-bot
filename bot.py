@@ -215,15 +215,22 @@ class Bot (WebScraping):
             return False
         
         # Validte session with cookies
-        login_button = self.get_elems (self.selectors["twitch_login_btn"])
-        if login_button and self.username != "no-user":
-            error = f"\t({self.stream} - {self.username}) cookie error"
+        try:
+            login_button = self.get_elems (self.selectors["twitch_login_btn"])
+        except:
+            error = f"\t({self.stream} - {self.username}) error loading page"
             print (error)
-            
-            # Disable user in backend
-            self.api.disable_user (self.username)
-            
             return False
+        else:
+            
+            if login_button and self.username != "no-user":
+                error = f"\t({self.stream} - {self.username}) cookie error"
+                print (error)
+                
+                # Disable user in backend
+                self.api.disable_user (self.username)
+                
+                return False
         
         # Check if stream is offline
         self.refresh_selenium ()
