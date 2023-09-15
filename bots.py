@@ -46,8 +46,9 @@ class BotsManager ():
         if DEBUG:
             # Force headless mode
             headless = False
-            
-        stream_users = self.users.copy ()
+        
+        # Copy bots for each streamer
+        stream_users =  [self.users.copy (), self.users.copy ()]
         
         # Create bots to each stream
         current_stream_id = 0
@@ -62,17 +63,16 @@ class BotsManager ():
                 continue
   
             # Get random user
-            if stream_users:
-                user = random.choice (stream_users)
-                stream_users.remove (user)
+            if stream_users[current_stream_id]:
+                user = random.choice (stream_users[current_stream_id])
+                stream_users[current_stream_id].remove (user)
                 
                 # Only start debug users
                 if DEBUG_USERS and user["name"] not in DEBUG_USERS:
                     continue
                 
             else:
-                continue
-            
+                break           
             
             # Wait random time before create bot
             sleep (random.randint (1, 10))

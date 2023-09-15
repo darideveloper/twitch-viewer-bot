@@ -117,37 +117,9 @@ class Bot (WebScraping):
             
             print (f"\t({self.stream} - {self.username}) Bot running (total bots in all stream: {len (self.bots_running)})")
             
-            # Delete current instance
-            del self
-            
         else:
             # Force end bot
-            self.driver.quit ()
-                
-    def __load_twitch__ (self) -> bool:
-        """ Try to load twitch page and validate if proxy is working
-
-        Returns:
-            bool: True if twitch load, else False
-        """
-        
-        try:
-            self.set_page ("http://ipinfo.io/json")
-            self.set_page (self.twitch_url_login)
-            self.refresh_selenium ()
-        except:
-            return False
-        else:
-            return True
-        
-    def __set_quality_mute__ (self): 
-        """ Set video quality to lower and mute stream, with local storage """
-        
-        try:
-            self.set_local_storage ("video-quality", '{"default":"160p30"}')
-            self.set_local_storage ("volume", "0")
-        except:
-            pass
+            self.driver.quit ()        
         
     def __start_bot__ (self) -> bool:
         """ Start browser and watch stream
@@ -156,73 +128,39 @@ class Bot (WebScraping):
             bool: True if browser started, False if not
         """
         
-        # Load fot load page and find proxy
-        while True:
+        try:
         
             # Get random proxy for current bot
             proxy = self.__get_random_proxy__ ()
             
+            # End if there are not proxies
+            if not self.proxies or not proxy:
+                print (f"\t({self.stream} - {self.username}) No more proxies available")                    
+                return False
+            
             # Try to start chrome
-            try:
-                super().__init__ (headless=self.headless, time_out=30,
-                                proxy_server=proxy["host"], proxy_port=proxy["port"],
-                                width=self.width, height=self.height)
-                
-            
-            except Exception as error:
-                
-                error = f"\t({self.stream} - {self.username}): error opening browser ({error})"
-                print (error)
-                
-                # Save error details
-                with open (self.log_path, "a", encoding='UTF-8') as file:
-                    file.write (error)
-                
-                # Save error in api only one time
-                if not Bot.error_send:
-                    self.api.log_error (error)
-                    Bot.error_send = True    
-                    
-                quit ()            
+            super().__init__ (headless=self.headless, time_out=30,
+                            proxy_server=proxy["host"], proxy_port=proxy["port"],
+                            width=self.width, height=self.height)
 
-            proxy_working = self.__load_twitch__ ()    
+            # Load login page
+            self.set_page ("http://ipinfo.io/json")
+            self.set_page (self.twitch_url_login)
+            self.refresh_selenium ()
             
-            if not proxy_working:
-                error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']}. Retrying..."
-                print (error)
+            # Load cookies
+            if self.username != "no-user":
+                self.set_cookies (self.cookies)
+                self.set_local_storage ("video-quality", '{"default":"160p30"}')
+                self.set_local_storage ("volume", "0")
                 
-                # End if there are not proxies
-                if not self.proxies:
-                    print (f"\t({self.stream} - {self.username}) No more proxies available")                    
-                    return False
-                
-                # Try again with other proxy
-                continue
-            
-            # End loop if proxy is working
-            break
-            
-        # Load cookies
-        if self.username != "no-user":
-            self.set_cookies (self.cookies)
-            self.__set_quality_mute__ ()
-        
-        # Open stream
-        try:
+            # Load stream page
             self.set_page (self.twitch_url_stream)
-        except Exception as e:
-            error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot"
-            return False
-        
-        # Validte session with cookies
-        try:
-            login_button = self.get_elems (self.selectors["twitch_login_btn"])
-        except:
-            error = f"\t({self.stream} - {self.username}) error loading page"
-            print (error)
-            return False
-        else:
+
             
+            # Validte session with cookies
+            login_button = self.get_elems (self.selectors["twitch_login_btn"])
+
             if login_button and self.username != "no-user":
                 error = f"\t({self.stream} - {self.username}) cookie error"
                 print (error)
@@ -231,35 +169,50 @@ class Bot (WebScraping):
                 self.api.disable_user (self.username)
                 
                 return False
-        
-        # Check if stream is offline
-        self.refresh_selenium ()
-        offline_status = self.get_elems (self.selectors["offline_status"])
-        if offline_status:
-            error = f"\t({self.stream} - {self.username}) stream offline"
-            print (error)
             
-            return False
-        
-        # Accept mature content
-        start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
-        if start_stream_elem:
-            self.click_js (self.selectors["start-stream-btn"])
-            sleep (5)
+            # Check if stream is offline
             self.refresh_selenium ()
-    
-        # Hide video
-        player = self.get_elems (self.selectors["player"])
-        if player:
-            script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
-            self.driver.execute_script (script)
+            offline_status = self.get_elems (self.selectors["offline_status"])
+            if offline_status:
+                error = f"\t({self.stream} - {self.username}) stream offline"
+                print (error)
+                
+                return False
+            
+            # Accept mature content
+            start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
+            if start_stream_elem:
+                self.click_js (self.selectors["start-stream-btn"])
+                sleep (5)
+                self.refresh_selenium ()
         
-        # Take screenshot
-        if self.take_screenshots:
-            screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
-            self.screenshot (screenshot_path)
-        
-        return True
+            # Hide video
+            player = self.get_elems (self.selectors["player"])
+            if player:
+                script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
+                self.driver.execute_script (script)
+            
+            # Take screenshot
+            if self.take_screenshots:
+                screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
+                self.screenshot (screenshot_path)
+                
+        except Exception as e: 
+            error = f"\t({self.stream} - {self.username}): error starting bot. Check more details in log file"
+            
+            # Save error details
+            with open (self.log_path, "a", encoding='UTF-8') as file:
+                file.write (error)
+                file.write (str(e))
+            
+            # Save error in api only one time
+            if not Bot.error_send:
+                self.api.log_error (f"{error}: {e}")
+                Bot.error_send = True    
+                
+            return False     
+        else:
+            return True
         
 if __name__ == "__main__":
     
