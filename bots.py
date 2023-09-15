@@ -127,7 +127,7 @@ class BotsManager ():
                         sleep (10)
                         
         # Infinity loop to watch stream
-        print ("All bots running...")
+        print (">>> All bots launched...")
         while True:
             sleep (60)
     

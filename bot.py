@@ -117,10 +117,6 @@ class Bot (WebScraping):
             
             print (f"\t({self.stream} - {self.username}) Bot running (total bots in all stream: {len (self.bots_running)})")
             
-        else:
-            # Force end bot
-            self.driver.quit ()        
-        
     def __start_bot__ (self) -> bool:
         """ Start browser and watch stream
 
