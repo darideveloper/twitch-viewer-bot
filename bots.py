@@ -126,8 +126,6 @@ class BotsManager ():
                         
         # Infinity loop to watch stream
         print (">>>>>>>>>> All bots launched...")
-        while True:
-            sleep (60)
     
     def __auto_run_bot__ (self, bot:Bot):
         """ Run single bot instance, with threading
