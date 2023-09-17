@@ -121,13 +121,11 @@ class BotsManager ():
                     
                     # Wait until all bots ends running
                     status = Bot.bots_status
-                    while True:
-                        if "loading" not in status:
-                            break
-                        sleep (10)
+                    while not status or "loading" in status:
+                        sleep (5)
                         
         # Infinity loop to watch stream
-        print (">>> All bots launched...")
+        print (">>>>>>>>>> All bots launched...")
         while True:
             sleep (60)
     
