@@ -75,6 +75,9 @@ class Bot (WebScraping):
         # Api connection
         self.api = Api ()
         
+        # Add new status to list
+        Bot.bots_status.append ("loading")
+        
     def __get_random_proxy__ (self) -> dict:
         """ Get random proxy from list and remove it
 
@@ -99,9 +102,6 @@ class Bot (WebScraping):
         """
         
         print (f"({self.stream} - {self.username}) Starting bot...")
-        
-        # Add new status to list
-        Bot.bots_status.append ("loading")
         
         # Start bot and catch load page error
         started = self.__start_bot__ ()
